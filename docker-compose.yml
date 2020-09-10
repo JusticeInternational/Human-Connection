@@ -9,7 +9,7 @@ services:
       args:
         - "BUILD_COMMIT=${TRAVIS_COMMIT}"
     ports:
-      - 3000:3000
+      - 3001:3001
       - 3002:3002
     networks:
       - hc-network
@@ -40,7 +40,7 @@ services:
     environment:
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
-      - CLIENT_URI=http://localhost:3000
+      - CLIENT_URI=http://localhost:3001
       - JWT_SECRET=b/&&7b78BF&fv/Vd
       - MAPBOX_TOKEN=pk.eyJ1IjoiaHVtYW4tY29ubmVjdGlvbiIsImEiOiJjajl0cnBubGoweTVlM3VwZ2lzNTNud3ZtIn0.KZ8KK9l70omjXbEkkbHGsQ
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78

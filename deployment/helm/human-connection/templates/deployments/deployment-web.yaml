@@ -35,7 +35,7 @@ spec:
         - name: HOST
           value: 0.0.0.0
         ports:
-        - containerPort: 3000
+        - containerPort: 3001
         resources: {}
         imagePullPolicy: Always
       restartPolicy: Always

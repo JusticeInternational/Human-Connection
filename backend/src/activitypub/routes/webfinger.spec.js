@@ -98,12 +98,12 @@ describe('webfinger', () => {
           expect(json).toHaveBeenCalledWith({
             links: [
               {
-                href: 'http://localhost:3000/activitypub/users/some-user',
+                href: 'http://localhost:3001/activitypub/users/some-user',
                 rel: 'self',
                 type: 'application/activity+json',
               },
             ],
-            subject: 'acct:some-user@localhost:3000',
+            subject: 'acct:some-user@localhost:3001',
           })
         })
       })

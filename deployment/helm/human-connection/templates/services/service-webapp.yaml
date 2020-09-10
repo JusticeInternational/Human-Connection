@@ -11,8 +11,8 @@ metadata:
 spec:
   ports:
     - name: {{ .Release.Name }}-webapp
-      port: 3000
+      port: 3001
       protocol: TCP
-      targetPort: 3000
+      targetPort: 3001
   selector:
     human-connection.org/selector: deployment-webapp

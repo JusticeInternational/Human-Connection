@@ -17,7 +17,7 @@ const neode = getNeode()
 //   slug: 'jenny-rostock',
 //   iat: 1550846680,
 //   exp: 1637246680,
-//   aud: 'http://localhost:3000',
+//   aud: 'http://localhost:3001',
 //   iss: 'http://localhost:4000',
 //   sub: 'u3'
 // }

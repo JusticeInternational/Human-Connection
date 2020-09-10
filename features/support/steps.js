@@ -11,7 +11,7 @@ After(async () => {
 })
 
 Given('our CLIENT_URI is {string}', function (string) {
-  expect(string).toEqual('http://localhost:3000')
+  expect(string).toEqual('http://localhost:3001')
   // This is just for documentation. When you see URLs in the response of
   // scenarios you, should be able to tell that it's coming from this
   // environment variable.

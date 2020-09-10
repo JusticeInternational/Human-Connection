@@ -22,7 +22,7 @@ kubectl port-forward -n monitoring <PROMETHEUS_SERVER_ID> 9090
 kubectl apply -f monitoring/grafana/config.yml
 helm --namespace monitoring install grafana stable/grafana -f monitoring/grafana/values.yml
 # Get the admin password for grafana from your kubernetes dashboard.
-kubectl --namespace monitoring port-forward <POD_NAME> 3000
+kubectl --namespace monitoring port-forward <POD_NAME> 3001
 # You can now see your grafana dashboard on: http://localhost:3000
 # Login with user 'admin' and the password you just looked up.
 # In your dashboard import this dashboard:

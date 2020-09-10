@@ -4,7 +4,7 @@ Feature: Webfinger discovery
   In order to follow the actor
 
   Background:
-    Given our CLIENT_URI is "http://localhost:3000"
+    Given our CLIENT_URI is "http://localhost:3001"
     And we have the following users in our database:
       | name           | slug           |
       | Peter Lustiger | peter-lustiger |
@@ -14,12 +14,12 @@ Feature: Webfinger discovery
     Then the server responds with a HTTP Status 200 and the following json:
     """
     {
-      "subject": "acct:peter-lustiger@localhost:3000",
+      "subject": "acct:peter-lustiger@localhost:3001",
       "links": [
         {
           "rel": "self",
           "type": "application/activity+json",
-          "href": "http://localhost:3000/activitypub/users/peter-lustiger"
+          "href": "http://localhost:3001/activitypub/users/peter-lustiger"
         }
       ]
     }

@@ -26,7 +26,7 @@ const {
   NEO4J_URI = 'bolt://localhost:7687',
   NEO4J_USERNAME = 'neo4j',
   NEO4J_PASSWORD = 'neo4j',
-  CLIENT_URI = 'http://localhost:3000',
+  CLIENT_URI = 'http://localhost:3001',
   GRAPHQL_URI = 'http://localhost:4000',
   REDIS_DOMAIN,
   REDIS_PORT,
