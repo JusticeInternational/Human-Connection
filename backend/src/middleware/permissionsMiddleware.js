@@ -105,6 +105,8 @@ export default shield(
       Comment: allow,
       Atention: allow,
       totalAtentionCategory: allow,
+      servedBeneficiariesService: allow,
+      servedBeneficiariesCategory: allow,
       totalAtentionService: allow,
       User: or(noEmailFilter, isAdmin),
       isLoggedIn: allow,
