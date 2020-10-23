@@ -19,5 +19,5 @@ type Query {
     isGeneral: Boolean
   ): [Service]
   totalAtentionService(id: ID, orgID: ID): Int @cypher(statement: "MATCH (this {id: id})<-[r:ASERVICE]-(a:Atention)-[o:ATENTIONS]->(org:Organization {id: orgID}) RETURN COUNT (a)")
-  servedBeneficiariesService(id:ID): [User] @cypher(statement: "MATCH (u:User)-[b:RECEIVED]->(a:Atention)-[r:ASERVICE]->(s:Service {id: id}) RETURN u")
+  servedBeneficiariesService(id:ID, orgID: ID): [User] @cypher(statement: "MATCH (u:User)-[b:RECEIVED]->(a:Atention)-[r:ASERVICE]->(s:Service {id: id}) WHERE (a)-[:ATENTIONS]->(:Organization {id: orgID}) RETURN u")
 }
