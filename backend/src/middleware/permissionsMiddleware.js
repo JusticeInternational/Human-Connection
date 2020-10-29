@@ -129,6 +129,8 @@ export default shield(
       UpdateOrganization: allow,
       provideAtentionCategory: allow,
       provideAtentionService: allow,
+      provideAtentionUnregisteredService: allow,
+      provideAtentionUnregisteredCategory: allow,
       CreatePost: isAuthenticated,
       CreateSuggestedResource: allow,
       UpdatePost: isAuthor,
@@ -171,7 +173,7 @@ export default shield(
       UpdateDonations: isAdmin,
     },
     User: {
-      email: or(isMyOwn, isAdmin),
+      email: allow,
     },
     Report: isModerator,
   },

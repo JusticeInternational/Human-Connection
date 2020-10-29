@@ -21,6 +21,12 @@ export default {
     target: 'User',
     direction: 'in',
   },
+  recipientUnregistered: {
+    type: 'relationship',
+    relationship: 'RECEIVED',
+    target: 'Unregistered',
+    direction: 'in',
+  },
   service: {
     type: 'relationship',
     relationship: 'ASERVICE',
