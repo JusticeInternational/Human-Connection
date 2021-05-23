@@ -86,7 +86,6 @@ function buildFactoryLocations(data) {
     }
     locations.push(Factory.build('location',locationEntry));
   });
-  console.log("Loading locations ("+ locations.length + ")");
   return locations; 
 }
 
@@ -124,7 +123,21 @@ function buildFactoryLocations(data) {
     })
     const { mutate } = createTestClient(server)
 
-    await Promise.all( buildFactoryLocations(csvData) );
+      var locations = []
+      const chunkSize = 5;
+      for (let i = 0; i < csvData.length; i += chunkSize) {
+        const chunk = csvData.slice(i, i + chunkSize);
+        try {
+          locations.push(...await Promise.all(buildFactoryLocations(chunk)));
+        } catch(err) {
+          console.error(`Failed processing chunk ${i} to ${chunkSize}`)
+          console.error(`Error occurred processing recordsprocessing records.\n\n${err}`) // eslint-disable-line no-console
+        }
+      }
+      // some debugging
+      // console.debug("Loaded locations ("+ locations.length + ")");
+      // console.debug(locations[3]['_properties'])
+      // console.debug(locations[3]['_properties'].get('id'))
 
     // close and save
     console.log("Seed RedSol Data ...")
