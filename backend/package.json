@@ -15,6 +15,7 @@
     "db:clean": "babel-node src/db/clean.js",
     "db:reset": "yarn run db:clean",
     "db:seed": "babel-node src/db/seed.js",
+    "db:seed-redsol": "babel-node src/db/seed-redsol.js",
     "db:migrate": "yarn run __migrate --store ./src/db/migrate/store.js",
     "db:migrate:create": "yarn run __migrate --template-file ./src/db/migrate/template.js --date-format 'yyyymmddHHmmss' create"
   },
@@ -90,6 +91,7 @@
     "mime-types": "^2.1.26",
     "minimatch": "^3.0.4",
     "mustache": "^4.0.1",
+    "neat-csv": "6.0.1",
     "neo4j-driver": "^4.0.2",
     "neo4j-graphql-js": "^2.11.5",
     "neode": "^0.3.7",
