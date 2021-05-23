@@ -125,44 +125,8 @@ function buildFactoryLocations(data) {
     const { mutate } = createTestClient(server)
 
     await Promise.all( buildFactoryLocations(csvData) );
-    // const [l1] = await Promise.all([
-    //     Factory.build('location', {
-    //         id: 'address.YY-VENEZUEL-2009051550-151',
-    //         type: 'address',
-    //         name: 'Ecuador',
-    //         nameES: 'Ecuador',
-    //         nameFR: 'Ecuador',
-    //         nameIT: 'Ecuador',
-    //         nameEN: 'Ecuador',
-    //         namePT: 'Ecuador',
-    //         nameDE: 'Ecuador',
-    //         nameNL: 'Ecuador',
-    //         namePL: 'Ecuador',
-    //         nameRU: 'Ecuador',
-    //         lng: -1.831239,
-    //         lat: -7.818340599999990,
-    //       })
-    // ])
 
-    // const [org1] = await Promise.all([
-    //     Factory.build(
-    //       'organization',
-    //       {
-    //         id: 'org1',
-    //         name: 'Organization 1',
-    //         description: 'This is a test description',
-    //         urlIcon: 'https://drive.google.com/file/d/1CW',
-    //         ranking: 4,
-    //         hourHand: '5:00 am a 5:00 pm',
-    //       },
-    //       {
-    //         planId: 'pl1',
-    //       },
-    //     )
-    //   ])
-    // await Promise.all([
-    //   org1.relateTo(l1, 'isIn'),
-    // ])
+    // close and save
     console.log("Seed RedSol Data ...")
     await driver.close()
     await neode.close()
