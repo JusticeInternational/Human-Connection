@@ -6,88 +6,11 @@ import createServer from '../server'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { gql } from '../helpers/jest'
+import { processFactory, identifyFactoryType } from '../helpers/Factory'
 import csvProcessData from '../helpers/csvReader'
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
-function buildFactoryLocations(data) {
-  
-  // debugging
-  // console.log(data[15])
-  var locations = []
-  data
-  .filter(element => {
-    var skipReturn = false;
-
-    // skip the header
-    if( element.Country === '' ||
-        element.Country === 'Country' ||
-        element.Country === undefined 
-    ) { return }
-
-    // skip empty address
-    if (element.Address === '') { return };
-
-    // map to id
-    element['id'] = element['Source file id'];
-    if (element.id === '') { return };
-
-    if (element.Longitude === 'Longitude') { skipReturn = true;};
-    if (typeof element.Longitude != 'string') { skipReturn = true;};
-    if (element.Latitude === 'Latitude') { skipReturn = true;};
-    if (typeof element.Latitude != 'string') { skipReturn = true;};
-
-
-    // filter Longitude
-    if (skipReturn === false ) {
-      
-      // remove extra dot's after the first dot
-      element.Longitude = element.Longitude.replace(/\./g, (i => m => !i++ ? m : '')(0));
-      try {
-        element.Longitude = element.Longitude * 1 // convert to a number
-        if(isNaN(element.Longitude)) {
-          skipReturn = true;
-        }
-      } catch {};
-    }
-
-    // filter Latitude
-    if (skipReturn === false ) {
-      
-      // remove extra dot's after the first dot
-      element.Latitude = element.Latitude.replace(/\./g, (i => m => !i++ ? m : '')(0));
-      try {
-        element.Latitude = element.Latitude * 1 // convert to a number
-        if(isNaN(element.Latitude)) {
-          skipReturn = true;
-        }
-      } catch {};
-    }
-    if( !skipReturn ) {
-      return element;
-    }
-  })
-  .forEach(element => {
-    var locationEntry = {
-      id: element.id,
-      type: 'address',
-      name: element.Address,
-      nameES: element.Address,
-      nameFR: element.Address,
-      nameIT: element.Address,
-      nameEN: element.Address,
-      namePT: element.Address,
-      nameDE: element.Address,
-      nameNL: element.Address,
-      namePL: element.Address,
-      nameRU: element.Address,
-      lng: element.Longitude,
-      lat: element.Latitude
-    }
-    locations.push(Factory.build('location',locationEntry));
-  });
-  return locations; 
-}
 
 /* eslint-disable no-multi-spaces */
 ;(async function () {
@@ -123,19 +46,44 @@ function buildFactoryLocations(data) {
     })
     const { mutate } = createTestClient(server)
 
-      var locations = []
-      const chunkSize = 5;
-      for (let i = 0; i < csvData.length; i += chunkSize) {
-        const chunk = csvData.slice(i, i + chunkSize);
-        try {
-          locations.push(...await Promise.all(buildFactoryLocations(chunk)));
-        } catch(err) {
-          console.error(`Failed processing chunk ${i} to ${chunkSize}`)
-          console.error(`Error occurred processing recordsprocessing records.\n\n${err}`) // eslint-disable-line no-console
-        }
-      }
+    // process countries
+    var nodes = []
+
+    // pData -> typedaata[]
+    console.log("here -> " + csvData.length)
+    var processData = generateFactoryData(csvData)
+
+    
+    // .map(element => {
+    //   return {
+    //     name: element.Country,
+    //     bfnode : buildFactoryLocations([ element ], "country")
+    //   };
+    // });
+
+    nodes = await processFactory(processData)
+    console.log(nodes)
+    
+    // countries.forEach(element => async function(){
+    //     console.log(`loading => ${element.name}`);
+    //     await Promise.all(element.bfnode);
+    // });
+    console.debug("Loaded " + nodes[0].type + " ("+ nodes.length + ")");
+
+    // // process addresses
+    // var locations = []
+    // const chunkSize = 5;
+    // for (let i = 0; i < csvData.length; i += chunkSize) {
+    //   const chunk = csvData.slice(i, i + chunkSize);
+    //   try {
+    //     locations.push(...await Promise.all(buildFactoryLocations(chunk)));
+    //   } catch(err) {
+    //     console.error(`Failed processing chunk ${i} to ${chunkSize}`)
+    //     console.error(`Error occurred processing recordsprocessing records.\n\n${err}`) // eslint-disable-line no-console
+    //   }
+    // }
+    // console.debug("Loaded locations ("+ locations.length + ")");
       // some debugging
-      // console.debug("Loaded locations ("+ locations.length + ")");
       // console.debug(locations[3]['_properties'])
       // console.debug(locations[3]['_properties'].get('id'))
 
