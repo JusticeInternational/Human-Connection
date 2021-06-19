@@ -1,10 +1,7 @@
 
-import { SeedLocations } from '../helpers/SeedLocations'
-import { SeedCategories } from '../helpers/SeedCategories'
+import { SeedLocations, CountryType, AddressType } from '../helpers/SeedLocations'
+import { SeedCategories, CategoryType } from '../helpers/SeedCategories'
 
-const Country = 'Country';
-const Address = 'address';
-const Categories = 'Category';
 const CHUNK_SIZE = 5;
 
 export async function processFactory(aData) {
@@ -16,11 +13,11 @@ export async function processFactory(aData) {
       var type = chunk[i].type
       try {
         switch (type) {
-          case Country:
-          case Address:
+          case CountryType:
+          case AddressType:
             results.push(...await SeedLocations(chunk));
             break;
-          case Categories:
+          case CategoryType:
             results.push(...await SeedCategories(chunk));
             break;
           default:
@@ -39,14 +36,14 @@ export function identifyFactoryType(data) {
     return data
     .filter(element => {
       // determine if this is country
-      if(element.hasOwnProperty('Country')) {
-          return Country;
+      if(element.hasOwnProperty(CountryType)) {
+          return CountryType;
       }
-      if(element.hasOwnProperty('Category')) {
-          return Categories;
+      if(element.hasOwnProperty(CategoryType)) {
+          return CategoryType;
       }
-      if(element.hasOwnProperty('Address')) {
-        return Address;
+      if(element.hasOwnProperty(AddressType)) {
+        return AddressType;
       }
     });
 }

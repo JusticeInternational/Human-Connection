@@ -1,4 +1,6 @@
 
+export const AddressType = 'Address'
+export const CountryType = 'Country'
 export async function SeedLocations(data) {
   
     // debugging
@@ -10,7 +12,7 @@ export async function SeedLocations(data) {
       var element = e.rawnode;
       // skip the header
       if( element.Country === '' ||
-          element.Country === 'Country' ||
+          element.Country === CountryType ||
           element.Country === undefined 
       ) { return }
   
@@ -59,7 +61,7 @@ export async function SeedLocations(data) {
       var element = e.rawnode
       var type = e.type
       switch (type) {
-        case 'address':
+        case AddressType:
           element = {
             id: element.id,
             type: type,
@@ -77,7 +79,7 @@ export async function SeedLocations(data) {
             lat: element.Latitude
           }
           break;
-        case 'Country':
+        case CountryType:
           element = {
             id: element.id,
             type: type,

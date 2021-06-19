@@ -1,5 +1,6 @@
 import Factory from '../db/factories'
 
+export const CategoryType = 'Category'
 export async function SeedCategories(data) {
   
     // debugging
