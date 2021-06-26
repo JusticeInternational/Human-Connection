@@ -1,10 +1,11 @@
+import Factory from '../db/factories'
 
 export const AddressType = 'Address'
 export const CountryType = 'Country'
 export async function SeedLocations(data) {
   
     // debugging
-    // console.log(data)
+    // console.log(data.length)
     var results = []
     data
     .filter(e => {
@@ -27,7 +28,6 @@ export async function SeedLocations(data) {
       if (typeof element.Longitude != 'string') { skipReturn = true;};
       if (element.Latitude === 'Latitude') { skipReturn = true;};
       if (typeof element.Latitude != 'string') { skipReturn = true;};
-  
   
       // filter Longitude
       if (skipReturn === false ) {
@@ -99,16 +99,20 @@ export async function SeedLocations(data) {
           console.log(`Unrecognized type ${type}.`);
           return; 
         }
-        return element; 
+        return {
+          key: e.key,
+          type: e.type,
+          rawnode: e.rawnode,
+          node: element
+        }; 
     })
-    .forEach(e => {
-      var element = e.rawnode;
+    .forEach(element => {
       results.push({
-          key: element[e.type],
-          type: type,
-          rawnode: element,
-          node: Factory.build('location',element)
+          key: element.key,
+          type: element.type,
+          rawnode: element.rawnode,
+          node: Factory.build('location', element.node)
       });
     });
-    return Promise.all(results);
+    return results;
   }

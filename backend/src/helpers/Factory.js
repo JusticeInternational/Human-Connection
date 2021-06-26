@@ -4,21 +4,33 @@ import { SeedCategories, CategoryType } from '../helpers/SeedCategories'
 
 const CHUNK_SIZE = 5;
 
+// force wait on factorybuilds
+export async function waitOnFactory(nodes) {
+  for (let i = 0; i < nodes.length; i++) {
+    var n = await nodes[i].node
+  }
+  return nodes
+}
+
 export async function processFactory(aData) {
     // process addresses
     var results = []
     const chunkSize = CHUNK_SIZE;
     for (let i = 0; i < aData.length; i += chunkSize) {
       const chunk = aData.slice(i, i + chunkSize);
-      var type = chunk[i].type
+      // console.log("here 0 -> i => " + i)
+      // console.log("here 1 -> chunk => " + chunk.length)
+      // console.log("here 2 -> " + Object.getOwnPropertyNames(chunk[0]))
+      // console.log("here 3 -> " + chunk[0]['type'])
+      var type = chunk[0]['type']
       try {
         switch (type) {
           case CountryType:
           case AddressType:
-            results.push(...await SeedLocations(chunk));
+            results.push(...await waitOnFactory(await SeedLocations(chunk)));
             break;
           case CategoryType:
-            results.push(...await SeedCategories(chunk));
+            results.push(...await waitOnFactory(await SeedCategories(chunk)));
             break;
           default:
               console.error(`Sorry, this is the wrong type for ${expr}.`);
@@ -33,23 +45,25 @@ export async function processFactory(aData) {
 }
 
 export function identifyFactoryType(data) {
-    return data
+    var type
+    data
     .filter(element => {
       // determine if this is country
       if(element.hasOwnProperty(CountryType)) {
-          return CountryType;
+          type = CountryType;
       }
       if(element.hasOwnProperty(CategoryType)) {
-          return CategoryType;
+          type = CategoryType;
       }
       if(element.hasOwnProperty(AddressType)) {
-        return AddressType;
+        type = AddressType;
       }
     });
+    return type
 }
 
 // return [{key:, type: , rawnode:, node:}]
-export function generateFactoryData(data) {
+export async function generateFactoryData(data) {
     var results = []
     var type = identifyFactoryType(data)
     results.push(...await mapElements(data, type))
@@ -63,7 +77,7 @@ export async function mapElements(data, type) {
 
       // unique elements only
       const keysearch = results.find( c => {
-        if(c.name === element[type]) {
+        if(c.key === element[type]) {
           return c
         }
       });

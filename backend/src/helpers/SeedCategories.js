@@ -59,16 +59,19 @@ export async function SeedCategories(data) {
           console.log(`Unrecognized type ${type}.`);
           return; 
         }
-        e.rawnode = element
-        return e; 
+        return {
+          key: e.key,
+          type: e.type,
+          rawnode: e.rawnode,
+          node: element
+        }; 
     })
-    .forEach(e => {
-      var element = e.rawnode;
+    .forEach(element => {
       results.push({
-        key: element[e.type],
-        type: e.type,
-        rawnode: element,
-        node: Factory.build('serviceCategory',element)
+          key: element.key,
+          type: element.type,
+          rawnode: element.rawnode,
+          node: Factory.build('serviceCategory', element.node)
       });
     });
     return Promise.all(results);

@@ -6,7 +6,7 @@ import createServer from '../server'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 import { gql } from '../helpers/jest'
-import { processFactory, identifyFactoryType } from '../helpers/Factory'
+import { processFactory, generateFactoryData } from '../helpers/Factory'
 import csvProcessData from '../helpers/csvReader'
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
@@ -47,45 +47,15 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const { mutate } = createTestClient(server)
 
     // process countries
+    // TODO: we need to do these in order countries ... -> Address etc.
     var nodes = []
 
-    // pData -> typedaata[]
-    console.log("here -> " + csvData.length)
-    var processData = generateFactoryData(csvData)
-
-    
-    // .map(element => {
-    //   return {
-    //     name: element.Country,
-    //     bfnode : buildFactoryLocations([ element ], "country")
-    //   };
-    // });
-
+    // process the CSV
+    var processData = await generateFactoryData(csvData)
     nodes = await processFactory(processData)
-    console.log(nodes)
-    
-    // countries.forEach(element => async function(){
-    //     console.log(`loading => ${element.name}`);
-    //     await Promise.all(element.bfnode);
-    // });
-    console.debug("Loaded " + nodes[0].type + " ("+ nodes.length + ")");
+    console.debug("Loaded " + nodes[0] + " ("+ nodes.length + ")");
+    // console.debug(nodes[0])
 
-    // // process addresses
-    // var locations = []
-    // const chunkSize = 5;
-    // for (let i = 0; i < csvData.length; i += chunkSize) {
-    //   const chunk = csvData.slice(i, i + chunkSize);
-    //   try {
-    //     locations.push(...await Promise.all(buildFactoryLocations(chunk)));
-    //   } catch(err) {
-    //     console.error(`Failed processing chunk ${i} to ${chunkSize}`)
-    //     console.error(`Error occurred processing recordsprocessing records.\n\n${err}`) // eslint-disable-line no-console
-    //   }
-    // }
-    // console.debug("Loaded locations ("+ locations.length + ")");
-      // some debugging
-      // console.debug(locations[3]['_properties'])
-      // console.debug(locations[3]['_properties'].get('id'))
 
     // close and save
     console.log("Seed RedSol Data ...")
