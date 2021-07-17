@@ -1,0 +1,28 @@
+type Unregistered {
+  id: ID!
+  name: String
+  lastName: String
+  identification: String
+  country: String
+  gender: Int
+  age: Int
+  phone: String
+  email: String
+  otherInfo: String
+  createdAt: String
+  updatedAt: String
+}
+
+type Query {
+  Unregistered(
+  id: ID
+  email: String # admins need to search for a user sometimes
+  name: String
+  lastName: String
+  identification: String
+  ): [Unregistered]
+}
+
+type Mutation {
+  DeleteUnregistered(id: ID!, resource: [Deletable]): Unregistered
+}

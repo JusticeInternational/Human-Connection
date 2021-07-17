@@ -39,6 +39,7 @@ input _AtentionFilter {
 type Atention {
   id: ID!
   recipient: User @relation(name: "RECEIVED", direction: "IN")
+  recipientUnregistered: Unregistered @relation(name: "RECEIVED", direction: "IN")
   organization: Organization @relation(name: "ATENTIONS", direction: "OUT")
   service: Service @relation(name: "ASERVICE", direction: "OUT")
   scategory: ServiceCategory @relation(name: "ACATEGORY", direction: "OUT")
@@ -68,5 +69,31 @@ type Mutation {
     orgID: ID!
     userID: ID!
     categoryID: ID!
+  ): Atention
+  provideAtentionUnregisteredService(
+    orgID: ID!
+    serviceID: ID!
+    name: String!
+    lastName: String!
+    identification: String
+    country: String
+    gender: Int
+    age: Int
+    phone: String
+    email: String
+    otherInfo: String
+  ): Atention
+  provideAtentionUnregisteredCategory(
+    orgID: ID!
+    categoryID: ID!
+    name: String!
+    lastName: String!
+    identification: String
+    country: String
+    gender: Int
+    age: Int
+    phone: String
+    email: String
+    otherInfo: String
   ): Atention
 }
