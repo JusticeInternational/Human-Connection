@@ -34,6 +34,22 @@ type Query {
 }
 
 type Mutation {
+    CreateOrganization (
+        id: ID!
+        name: String
+        webPage: String
+        phone: String
+        ranking: String
+        hourHand: String
+        description: String
+        servicesDesc: String
+        iconName: String
+        urlIcon: String
+    ): Organization
+    AssociateOrganizationToUser (
+        userId: ID!
+        organizationId: ID!
+    ): Organization
   UpdateOrganization (
   id: ID!
   name: String

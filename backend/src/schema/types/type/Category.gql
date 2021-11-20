@@ -38,4 +38,5 @@ type Query {
     offset: Int
     orderBy: [_CategoryOrdering]
   ): [Category]
+  Categories: [Category] @cypher(statement: "MATCH (c:Category) RETURN DISTINCT c")
 }
