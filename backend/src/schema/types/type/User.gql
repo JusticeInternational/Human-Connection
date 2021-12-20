@@ -203,6 +203,7 @@ type Mutation {
   allowEmbedIframes: Boolean
   showShoutsPublicly: Boolean
   locale: String
+  role: UserGroup
   ): User
 
   DeleteUser(id: ID!, resource: [Deletable]): User

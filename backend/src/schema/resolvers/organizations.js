@@ -43,9 +43,9 @@ export default {
           const updateOrgTransactionResponse = await transaction.run(
             `
                MATCH (u:User {id: $params.userId})
-               MATCH (o:Organization {id: $params.organizationId})
-               MERGE (u)-[:APPROPRIATED_OF]->(o)
-               RETURN o {.*}
+               MATCH (org:Organization {id: $params.organizationId})
+               MERGE (u)-[:APPROPRIATED_OF]->(org)
+               RETURN org {.*}
             `,
             { params },
           )
