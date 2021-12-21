@@ -1,3 +1,10 @@
+enum _LoactionOrdering {
+    id_asc
+    id_desc
+    name_asc
+    name_desc
+}
+
 type Location {
   id: ID!
   name: String!
@@ -14,5 +21,13 @@ type Location {
   lat: Float
   lng: Float
   parent: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+}
+
+type Query {
+    Location(
+        id: ID
+        name: String
+        orderBy: [_LoactionOrdering]
+    ): [Location]
 }
 
