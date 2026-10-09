@@ -23,3 +23,13 @@ type Query {
   servedUnregisteredService(id:ID, orgID: ID): [Unregistered] @cypher(statement: "MATCH (u:Unregistered)-[b:RECEIVED]->(a:Atention)-[r:ASERVICE]->(s:Service {id: id}) WHERE (a)-[:ATENTIONS]->(:Organization {id: orgID}) RETURN u")
   Services: [Service] @cypher(statement: "MATCH (s:Service) RETURN DISTINCT s")
 }
+
+type Mutation {
+  CreateService(
+    name: String!
+    description: String!
+    isGeneral: Boolean
+    organizationId: ID!
+    serviceCategoryId: ID!
+  ): Service
+}

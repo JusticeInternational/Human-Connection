@@ -133,6 +133,7 @@ export default shield(
       CreateUser: allow,
       UpdateUser: allow,
       CreateOrganization: allow,
+      CreateService: allow,
       AssociateOrganizationToUser: allow,
       UpdateOrganization: allow,
       provideAtentionCategory: allow,
