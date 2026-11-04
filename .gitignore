@@ -1,4 +1,7 @@
 .env
+/deployment/lightsail-test/.env.example
+/deployment/lightsail-test/local-env.sh
+/deployment/lightsail-test/allowed-ips.txt
 .idea
 *.iml
 .DS_Store
