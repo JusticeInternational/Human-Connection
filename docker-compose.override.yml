@@ -18,11 +18,13 @@ services:
       - PUBLIC_REGISTRATION=false
     command: yarn run dev
   backend:
+    image: humanconnection/nitro-backend:build-and-test
     build:
       context: backend
       target: build-and-test
     volumes:
       - ./backend:/nitro-backend
+      - backend_node_modules_dev:/nitro-backend/node_modules
     command: yarn run dev
     environment:
       - SMTP_HOST=smtp.gmail.com
@@ -41,6 +43,9 @@ services:
       - hc-network
     ports:
       - 3503:80
+
+volumes:
+  backend_node_modules_dev:
 
 networks:
   hc-network:
