@@ -1,25 +1,25 @@
-import { createTestClient } from 'apollo-server-testing'
-import createServer from '../server'
 import Factory from '../db/factories'
 import { getNeode, getDriver } from '../db/neo4j'
 
 /* eslint-disable no-multi-spaces */
 ;(async function () {
-  let authenticatedUser = null
-  const driver = getDriver()
-  const neode = getNeode()
+  const adminPassword = process.env.LIGHTSAIL_SEED_ADMIN_PASSWORD
+  const userPassword = process.env.LIGHTSAIL_SEED_USER_PASSWORD
+  const passwordLength = 8
 
   try {
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode,
-          user: authenticatedUser,
-        }
-      },
-    })
-    const { mutate } = createTestClient(server)
+    if (!adminPassword || adminPassword.length < passwordLength) {
+      throw new Error(`LIGHTSAIL_SEED_ADMIN_PASSWORD must be at least ${passwordLength} characters.`)
+    }
+    if (!userPassword || userPassword.length < passwordLength) {
+      throw new Error(`LIGHTSAIL_SEED_USER_PASSWORD must be at least ${passwordLength} characters.`)
+    }
+    if (adminPassword === userPassword) {
+      throw new Error('Seeded admin and regular-user passwords must be different.')
+    }
+
+    const driver = getDriver()
+    const neode = getNeode()
 
 // LOCATION
     const [UnitesStates, Venezuela, California, Caracas] = await Promise.all([
@@ -72,6 +72,7 @@ import { getNeode, getDriver } from '../db/neo4j'
         },
         {
           email: 'admin@example.org',
+          password: adminPassword,
         },
       ),
       Factory.build(
@@ -84,6 +85,7 @@ import { getNeode, getDriver } from '../db/neo4j'
         },
         {
           email: 'cpaz@example.com',
+          password: userPassword,
         },
       ),
     ])

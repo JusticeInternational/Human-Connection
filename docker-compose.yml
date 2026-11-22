@@ -42,6 +42,8 @@ services:
       - GRAPHQL_URI=http://backend:4000
       - CLIENT_URI=http://localhost:3000
       - JWT_SECRET=b/&&7b78BF&fv/Vd
+      - "LIGHTSAIL_SEED_ADMIN_PASSWORD=${LIGHTSAIL_SEED_ADMIN_PASSWORD:-redsolADmail2026}"
+      - "LIGHTSAIL_SEED_USER_PASSWORD=${LIGHTSAIL_SEED_USER_PASSWORD:-redsolUSmail2026}"
       - PRIVATE_KEY_PASSPHRASE=a7dsf78sadg87ad87sfagsadg78
       - "DEBUG=${DEBUG}"
   neo4j:

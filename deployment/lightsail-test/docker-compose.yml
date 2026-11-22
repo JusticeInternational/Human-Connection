@@ -31,6 +31,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in deployment/lightsail-test/.env}
       PRIVATE_KEY_PASSPHRASE: ${PRIVATE_KEY_PASSPHRASE:?Set PRIVATE_KEY_PASSPHRASE in deployment/lightsail-test/.env}
       MAPBOX_TOKEN: ${MAPBOX_TOKEN:-disabled-for-backend-test}
+      LIGHTSAIL_SEED_ADMIN_PASSWORD: ${LIGHTSAIL_SEED_ADMIN_PASSWORD:?Set LIGHTSAIL_SEED_ADMIN_PASSWORD in deployment/lightsail-test/.env}
+      LIGHTSAIL_SEED_USER_PASSWORD: ${LIGHTSAIL_SEED_USER_PASSWORD:?Set LIGHTSAIL_SEED_USER_PASSWORD in deployment/lightsail-test/.env}
       PUBLIC_REGISTRATION: "false"
     mem_limit: 1g
     cpus: 0.5

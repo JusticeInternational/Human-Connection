@@ -7,7 +7,7 @@ import { getDriver, getNeode } from '../db/neo4j'
 const instance = getNeode()
 const driver = getDriver()
 
-let query, authenticatedUser, owner, anotherRegularUser, administrator, variables, moderator
+let query, mutate, authenticatedUser, owner, anotherRegularUser, administrator, variables, moderator
 
 describe('authorization', () => {
   beforeAll(async () => {
@@ -19,11 +19,36 @@ describe('authorization', () => {
         user: authenticatedUser,
       }),
     })
-    query = createTestClient(server).query
+    const client = createTestClient(server)
+    query = client.query
+    mutate = client.mutate
   })
 
   afterEach(async () => {
     await cleanDatabase()
+  })
+
+  describe('anonymous mutations', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('requires authentication for organization updates', async () => {
+      await expect(
+        mutate({
+          mutation: gql`
+            mutation {
+              UpdateOrganization(id: "org0") {
+                id
+              }
+            }
+          `,
+        }),
+      ).resolves.toMatchObject({
+        errors: [{ message: 'Not Authorised!' }],
+        data: { UpdateOrganization: null },
+      })
+    })
   })
 
   describe('given an owner, an other user, an admin, a moderator', () => {

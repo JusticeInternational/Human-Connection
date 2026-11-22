@@ -9,7 +9,7 @@ HTTPS at `https://sol.humantics.ai` through the instance's Nginx proxy; port
 personal data. Neo4j is not published to the host, registration is disabled,
 and the API and database have container resource limits.
 
-The `yarn run db:seed:redsol` seed requires distinct passwords of at least 16
+The `yarn run db:seed:redsol` seed requires distinct passwords of at least 8
 characters for the seeded administrator and regular user when run in a
 development environment. Supply `LIGHTSAIL_SEED_ADMIN_PASSWORD` and
 `LIGHTSAIL_SEED_USER_PASSWORD` to the seed process; never reuse these passwords

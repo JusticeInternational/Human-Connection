@@ -13,6 +13,8 @@ const isAuthenticated = rule({
   return !!(ctx && ctx.user && ctx.user.id)
 })
 
+export const requiresAuthentication = isAuthenticated
+
 const isModerator = rule()(async (parent, args, { user }, info) => {
   return user && (user.role === 'moderator' || user.role === 'admin')
 })
@@ -24,18 +26,19 @@ const isAdmin = rule()(async (parent, args, { user }, info) => {
 const onlyYourself = rule({
   cache: 'no_cache',
 })(async (parent, args, context, info) => {
-  return context.user.id === args.id
+  return !!(context.user && context.user.id === args.id)
 })
 
 const isMyOwn = rule({
   cache: 'no_cache',
 })(async (parent, args, context, info) => {
-  return context.user.id === parent.id
+  return !!(context.user && context.user.id === parent.id)
 })
 
 const isMySocialMedia = rule({
   cache: 'no_cache',
 })(async (_, args, { user }) => {
+  if (!user) return false
   let socialMedia = await neode.find('SocialMedia', args.id)
   socialMedia = await socialMedia.toJson()
   return socialMedia.ownedBy.node.id === user.id
@@ -68,7 +71,7 @@ const isAuthor = rule({
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
 })(async (parent, args, context, info) => {
-  return context.user.id === args.id
+  return !!(context.user && context.user.id === args.id)
 })
 
 const noEmailFilter = rule({
@@ -76,6 +79,9 @@ const noEmailFilter = rule({
 })(async (_, args) => {
   return !('email' in args)
 })
+
+export const userEmailPermission = or(isMyOwn, isAdmin)
+export const updateUserPermission = or(onlyYourself, isAdmin)
 
 const publicRegistration = rule()(() => !!CONFIG.PUBLIC_REGISTRATION)
 
@@ -125,23 +131,14 @@ export default shield(
       Donations: isAuthenticated,
     },
     Mutation: {
-      '*': deny,
+      '*': requiresAuthentication,
       login: allow,
       SignupByInvitation: allow,
       Signup: or(publicRegistration, isAdmin),
       SignupVerification: allow,
-      CreateUser: allow,
-      UpdateUser: allow,
-      CreateOrganization: allow,
-      CreateService: allow,
-      AssociateOrganizationToUser: allow,
-      UpdateOrganization: allow,
-      provideAtentionCategory: allow,
-      provideAtentionService: allow,
-      provideAtentionUnregisteredService: allow,
-      provideAtentionUnregisteredCategory: allow,
       CreatePost: isAuthenticated,
-      CreateSuggestedResource: allow,
+      CreateSuggestedResource: isAuthenticated,
+      UpdateUser: updateUserPermission,
       UpdatePost: isAuthor,
       DeletePost: isAuthor,
       fileReport: isAuthenticated,
@@ -159,7 +156,7 @@ export default shield(
       shout: isAuthenticated,
       unshout: isAuthenticated,
       changePassword: isAuthenticated,
-      changeUserPassword: allow, // TODO change to isAuthenticated
+      changeUserPassword: isAuthenticated,
       review: isModerator,
       CreateComment: isAuthenticated,
       UpdateComment: isAuthor,
@@ -182,7 +179,7 @@ export default shield(
       UpdateDonations: isAdmin,
     },
     User: {
-      email: allow,
+      email: userEmailPermission,
     },
     Report: isModerator,
   },
