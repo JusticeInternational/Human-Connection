@@ -11,14 +11,18 @@ services:
     restart: unless-stopped
     depends_on:
       - neo4j
-    ports:
-      - "4000:4000"
     networks:
       - hc-test
+      - vikunja
     volumes:
       - uploads:/nitro-backend/public/uploads
     environment:
       NODE_ENV: production
+      PORT: "4000"
+      VIRTUAL_HOST: sol.humantics.ai
+      VIRTUAL_PORT: "4000"
+      LETSENCRYPT_HOST: sol.humantics.ai
+      LETSENCRYPT_EMAIL: tech@corechs.com
       NEO4J_URI: bolt://neo4j:7687
       NEO4J_USERNAME: neo4j
       NEO4J_PASSWORD: ${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in deployment/lightsail-test/.env}
@@ -60,6 +64,9 @@ services:
 networks:
   hc-test:
     driver: bridge
+  vikunja:
+    external:
+      name: vikunja_default
 
 volumes:
   neo4j_data:

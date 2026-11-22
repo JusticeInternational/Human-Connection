@@ -28,6 +28,7 @@ const {
   NEO4J_PASSWORD = 'neo4j',
   CLIENT_URI = 'http://localhost:3000',
   GRAPHQL_URI = 'http://localhost:4000',
+  PORT = '4000',
   REDIS_DOMAIN,
   REDIS_PORT,
   REDIS_PASSWORD,
@@ -59,6 +60,7 @@ export const neo4jConfigs = { NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD }
 export const serverConfigs = {
   CLIENT_URI,
   GRAPHQL_URI,
+  PORT,
   PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true',
 }
 

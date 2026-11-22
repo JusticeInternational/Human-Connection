@@ -3,14 +3,33 @@
 This isolated Compose project runs the backend with its own Neo4j database. It
 does not attach to or modify other Compose projects on the instance.
 
-This deployment is for disposable test data only. The API is exposed over
-plain HTTP on port 4000, with no TLS. Do not use real accounts, passwords, or
+This deployment is for disposable test data only. The API is served over
+HTTPS at `https://sol.humantics.ai` through the instance's Nginx proxy; port
+4000 is not published on the host. Do not use real accounts, passwords, or
 personal data. Neo4j is not published to the host, registration is disabled,
 and the API and database have container resource limits.
 
-The `yarn run db:seed:redsol` seed creates `admin@example.org` with the
-password `1234`. Anyone who can reach the public API can use that seeded
-account; never use this seed or public HTTP setup for production data.
+The `yarn run db:seed:redsol` seed requires distinct passwords of at least 16
+characters for the seeded administrator and regular user when run in a
+development environment. Supply `LIGHTSAIL_SEED_ADMIN_PASSWORD` and
+`LIGHTSAIL_SEED_USER_PASSWORD` to the seed process; never reuse these passwords
+for real accounts. The production image does not include the seed tooling. If
+the seed was already run with its former default credentials, reset or remove
+those seeded accounts before any future public exposure; changing the seed
+script does not change existing database records.
+
+The API limits HTTP requests to 120 per minute per client address, login
+attempts to 10 per 15 minutes per address, JSON and form request bodies to
+1 MiB, and GraphQL operations to 12 levels and 500 fields. WebSocket
+connections are limited to 20 per minute per client address and use the same
+GraphQL operation limits and login throttling. Persisted-query hash-only
+requests are disabled so login throttling can inspect each operation. HTTP
+headers and request bodies have 15- and 30-second receive timeouts. These
+in-memory limits apply per backend process; deployments with multiple backend
+instances need a shared rate-limit store.
+The backend does not trust forwarded client-IP headers; if a trusted reverse
+proxy is introduced later, configure its exact addresses before enabling proxy
+trust or relying on address-based limits.
 
 ## Release backend changes
 
@@ -41,32 +60,19 @@ This releases backend code only. It does not deploy webapp changes or run
 database migrations/seeds. Review and test backend changes locally before
 releasing them.
 
-## Manage backend IP access
+## Network access
 
-The source of truth for backend access is [`allowed-ips.txt`](./allowed-ips.txt).
-Put one IPv4 address on each line. Blank lines and comments beginning with
-`#` are ignored. Addresses are restricted to individual `/32` entries. The allowlist commands
-also require `AWS_PROFILE`, `AWS_REGION`, and `LIGHTSAIL_INSTANCE` to be set in
-the environment.
+External API traffic should go through the Nginx proxy on ports 80/443. The
+backend listens on port 4000 inside Docker only. Remove any existing Lightsail
+TCP 4000 firewall rules; do not use the former allowlist sync command, which
+is disabled to prevent reopening the port.
 
 ```bash
 ./deployment/lightsail-test/deploy.sh allowlist list
-./deployment/lightsail-test/deploy.sh allowlist sync
 ```
 
-Edit `allowed-ips.txt`, then run `allowlist sync` to make the Lightsail TCP
-port 4000 rule match the file. Sync closes unrestricted IPv4/IPv6 access,
-removes addresses no longer listed, and adds new addresses. Do not remove all
-addresses: the script rejects an empty allowlist to avoid accidentally locking
-out everyone. These changes affect only port 4000; SSH, HTTP, and HTTPS
-firewall rules are left unchanged. AWS CLI credentials for the selected profile
-and region must be valid.
-
-```bash
-export AWS_PROFILE="<aws-profile>"
-export AWS_REGION="<aws-region>"
-export LIGHTSAIL_INSTANCE="<instance-name>"
-```
+The list command reports any legacy TCP 4000 firewall entries and requires
+valid AWS CLI credentials for the selected profile and region.
 
 ## Configure
 
@@ -87,9 +93,8 @@ sudo docker logs --tail=50 hc-test_backend_1
 sudo docker logs --tail=50 hc-test-neo4j
 ```
 
-After setting `LIGHTSAIL_HOST`, the GraphQL endpoint is
-`http://<LIGHTSAIL_HOST>:4000/graphql`. The Lightsail firewall must allow
-inbound TCP port 4000 for public access. Do not expose Neo4j ports 7474 or 7687.
+The GraphQL endpoint is `https://sol.humantics.ai/graphql`. Do not expose
+Neo4j ports 7474 or 7687.
 
 Restart the test containers without deleting their data:
 

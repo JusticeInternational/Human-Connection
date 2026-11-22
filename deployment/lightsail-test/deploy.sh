@@ -10,7 +10,7 @@ user="${LIGHTSAIL_USER:-}"
 key="${LIGHTSAIL_SSH_KEY:-}"
 expected_fingerprint="${LIGHTSAIL_HOST_FINGERPRINT:-}"
 project_dir="${LIGHTSAIL_PROJECT_DIR:-}"
-endpoint="http://${host}:4000/graphql"
+endpoint="https://sol.humantics.ai/graphql"
 build_commit="$(git -C "$repo_root" rev-parse --short HEAD)"
 release_id="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 remote_release="$project_dir/releases/$release_id"
@@ -136,35 +136,9 @@ manage_allowlist() {
         printf 'Usage: %s allowlist sync\n' "$0" >&2
         return 2
       }
-      desired_cidrs="$(configured_backend_cidrs)"
-      current_cidrs="$(backend_cidrs cidrs)"
-      if grep -Fxq '0.0.0.0/0' <<< "$current_cidrs"; then
-        close_backend_cidr '0.0.0.0/0'
-      fi
-      current_cidrs="$(backend_cidrs ipv6Cidrs)"
-      if grep -Fxq '::/0' <<< "$current_cidrs"; then
-        close_backend_cidr '::/0' ipv6Cidrs
-      fi
-      while IFS= read -r address; do
-        current_cidrs="$(backend_cidrs cidrs)"
-        if ! grep -Fxq "$address" <<< "$current_cidrs"; then
-          open_backend_cidr "$address"
-        fi
-      done <<< "$desired_cidrs"
-      current_cidrs="$(backend_cidrs cidrs)"
-      while IFS= read -r address; do
-        if ! grep -Fxq "$address" <<< "$desired_cidrs"; then
-          close_backend_cidr "$address"
-        fi
-      done <<< "$current_cidrs"
-      current_cidrs="$(backend_cidrs ipv6Cidrs)"
-      while IFS= read -r address; do
-        if [[ -n "$address" ]]; then
-          close_backend_cidr "$address" ipv6Cidrs
-        fi
-      done <<< "$current_cidrs"
-      printf 'Applied backend allowlist from %s:\n' "$allowlist_file"
-      list_backend_allowlist
+      printf 'Port 4000 is no longer published; this command will not modify Lightsail firewall rules.\n' >&2
+      printf 'Remove any existing TCP 4000 rules with Lightsail after confirming access is no longer needed.\n' >&2
+      return 2
       ;;
     *)
       printf 'Usage: %s allowlist {list|sync}\n' "$0" >&2
@@ -306,10 +280,14 @@ run_backend() {
     --restart unless-stopped \
     --network "$network" \
     --network-alias backend \
-    --publish 4000:4000 \
     --volume hc-test_uploads:/nitro-backend/public/uploads \
+    --env VIRTUAL_HOST=sol.humantics.ai \
+    --env VIRTUAL_PORT=4000 \
+    --env LETSENCRYPT_HOST=sol.humantics.ai \
+    --env LETSENCRYPT_EMAIL=tech@corechs.com \
     --env-file "$environment_file" \
     --env NODE_ENV=production \
+    --env PORT=4000 \
     --env NEO4J_URI=bolt://neo4j:7687 \
     --env NEO4J_USERNAME=neo4j \
     --env PUBLIC_REGISTRATION=false \
@@ -318,15 +296,36 @@ run_backend() {
     --log-opt max-size=10m \
     --log-opt max-file=3 \
     "$1" >/dev/null
+  sudo -n docker network connect vikunja_default "$container"
+  sudo -n docker restart "$container" >/dev/null
 }
 
 smoke_test() {
   local attempt response
   for attempt in $(seq 1 60); do
-    if response="$(curl --fail --silent --show-error --max-time 5 \
-      -H 'Content-Type: application/json' \
-      --data-binary '{"query":"{ Organization(id: \"org0\") { id } }"}' \
-      http://127.0.0.1:4000/graphql 2>/dev/null)"; then
+    if response="$(sudo -n docker exec "$container" node -e '
+      const http = require("http");
+      const request = http.request({
+        host: "127.0.0.1",
+        port: 4000,
+        path: "/graphql",
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      }, response => {
+        let body = "";
+        response.on("data", chunk => { body += chunk; });
+        response.on("end", () => {
+          if (response.statusCode < 200 || response.statusCode >= 300 ||
+              !body.includes("\"data\"") || body.includes("\"errors\"")) {
+            process.exitCode = 1;
+          } else {
+            process.stdout.write(body);
+          }
+        });
+      });
+      request.on("error", () => { process.exitCode = 1; });
+      request.end(JSON.stringify({ query: "{ Organization(id: \"org0\") { id } }" }));
+    ' 2>/dev/null)"; then
       if [[ "$response" == *'"data"'* && "$response" != *'"errors"'* ]]; then
         return 0
       fi
